@@ -28,3 +28,8 @@ HEADERS += \
     libs/qmlglsink/gst-plugins-good/ext/qt/gstqtsrc.h \
     libs/qmlglsink/gst-plugins-good/ext/qt/qtwindow.h \
     libs/qmlglsink/gst-plugins-good/ext/qt/qtitem.h
+
+win32:msvc* {
+    QMAKE_CXXFLAGS_WARN_ON -= /WX    # Remove inherited /WX
+    QMAKE_CXXFLAGS += /std:c++20     # Enable C++20 (no need for /WX-)
+}

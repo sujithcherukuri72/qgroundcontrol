@@ -35,19 +35,24 @@ CONFIG  += QGC_DISABLE_PX4_PLUGIN_FACTORY
 DEFINES += CUSTOMHEADER=\"\\\"CustomPlugin.h\\\"\"
 DEFINES += CUSTOMCLASS=CustomPlugin
 
-TARGET   = CustomQGroundControl
-DEFINES += QGC_APPLICATION_NAME='"\\\"Custom QGroundControl\\\""'
-
-DEFINES += QGC_ORG_NAME=\"\\\"qgroundcontrol.org\\\"\"
-DEFINES += QGC_ORG_DOMAIN=\"\\\"org.qgroundcontrol\\\"\"
-
-QGC_APP_NAME        = "Custom QGroundControl"
-QGC_BINARY_NAME     = "CustomQGroundControl"
+QGC_APP_NAME        = "Indrones"
+QGC_BINARY_NAME     = "CustomIndrones"
 QGC_ORG_NAME        = "Custom"
-QGC_ORG_DOMAIN      = "org.custom"
-QGC_ANDROID_PACKAGE = "org.custom.qgroundcontrol"
-QGC_APP_DESCRIPTION = "Custom QGroundControl"
-QGC_APP_COPYRIGHT   = "Copyright (C) 2020 QGroundControl Development Team. All rights reserved."
+QGC_ORG_DOMAIN      = "org.Indrones"
+QGC_ANDROID_PACKAGE = "org.custom.Indrones"
+QGC_APP_DESCRIPTION = "Indrones"
+QGC_APP_COPYRIGHT   = "Copyright (C) 2020 Indrones Development Team. All rights reserved."
+
+TARGET   = CustomQGroundControl
+DEFINES += QGC_APPLICATION_NAME=\"\\\"$$QGC_APP_NAME\\\"\"
+DEFINES += QGC_ORG_NAME=\"\\\"$$QGC_ORG_NAME\\\"\"
+DEFINES += QGC_ORG_DOMAIN=\"\\\"$$QGC_ORG_DOMAIN\\\"\"
+DEFINES += QGC_BINARY_NAME=\"\\\"$$QGC_BINARY_NAME\\\"\"
+DEFINES += QGC_ANDROID_PACKAGE=\"\\\"$$QGC_ANDROID_PACKAGE\\\"\"
+DEFINES += QGC_APP_DESCRIPTION=\"\\\"$$QGC_APP_DESCRIPTION\\\"\"
+DEFINES += QGC_APP_COPYRIGHT=\"\\\"$$QGC_APP_COPYRIGHT\\\"\"
+
+
 
 # Our own, custom resources
 RESOURCES += \
@@ -82,4 +87,3 @@ SOURCES += \
     $$PWD/src/AutoPilotPlugin/CustomAutoPilotPlugin.cc \
     $$PWD/src/FirmwarePlugin/CustomFirmwarePlugin.cc \
     $$PWD/src/FirmwarePlugin/CustomFirmwarePluginFactory.cc \
-

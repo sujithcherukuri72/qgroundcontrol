@@ -220,7 +220,7 @@ install(
     DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
 )
 install(
-    FILES ${CMAKE_SOURCE_DIR}/resources/icons/qgroundcontrol.png
+    FILES ${CMAKE_SOURCE_DIR}/resources/icons/indrones-logo.png
     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps/
     RENAME org.mavlink.qgroundcontrol.png
 )

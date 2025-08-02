@@ -49,7 +49,7 @@ LinuxBuild {
 }
 
 WindowsBuild {
-    RC_ICONS = resources/icons/qgroundcontrol.ico
+    RC_ICONS = resources/icons/indrones-logo.ico
     CONFIG += resources_big
 }
 
@@ -57,11 +57,11 @@ WindowsBuild {
 # Branding
 #
 
-QGC_APP_NAME        = "QGroundControl"
-QGC_ORG_NAME        = "QGroundControl.org"
-QGC_ORG_DOMAIN      = "org.qgroundcontrol"
-QGC_APP_DESCRIPTION = "Open source ground control app provided by QGroundControl dev team"
-QGC_APP_COPYRIGHT   = "Copyright (C) 2019 QGroundControl Development Team. All rights reserved."
+QGC_APP_NAME        = "GroundControlStation"
+QGC_ORG_NAME        = "Indrones.org"
+QGC_ORG_DOMAIN      = "Indrones.com"
+QGC_APP_DESCRIPTION = "Indrones Solutions Private Limited"
+QGC_APP_COPYRIGHT   = "Copyright (C) Development Team. All rights reserved."
 
 WindowsBuild {
     QGC_INSTALLER_SCRIPT        = "$$SOURCE_DIR\\deploy\\windows\\nullsoft_installer.nsi"
@@ -325,9 +325,8 @@ contains (DEFINES, QGC_DISABLE_PAIRING) {
 include(QGCExternalLibs.pri)
 
 #
-# Resources (custom code can replace them)
+# Resources (custom code can replace them) added the dashboard items here
 #
-
 CustomBuild {
     exists($$PWD/custom/qgroundcontrol.qrc) {
         message("Using custom qgroundcontrol.qrc")
@@ -354,9 +353,9 @@ CustomBuild {
         RESOURCES += $$PWD/resources/InstrumentValueIcons/InstrumentValueIcons.qrc
     }
 } else {
-    DEFINES += QGC_APPLICATION_NAME=\"\\\"QGroundControl\\\"\"
-    DEFINES += QGC_ORG_NAME=\"\\\"QGroundControl.org\\\"\"
-    DEFINES += QGC_ORG_DOMAIN=\"\\\"org.qgroundcontrol\\\"\"
+    DEFINES += QGC_APPLICATION_NAME=\"\\\"GroundControlStation\\\"\"
+    DEFINES += QGC_ORG_NAME=\"\\\"Indrones.org\\\"\"
+    DEFINES += QGC_ORG_DOMAIN=\"\\\"Indrones.com\\\"\"
     RESOURCES += \
         $$PWD/qgroundcontrol.qrc \
         $$PWD/qgcresources.qrc \
@@ -561,6 +560,10 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory { APMFirmwarePlugin { 
         #src/qgcunittest/MessageBoxTest.cc \
 
 } } } } } }
+# Log-file helper
+SOURCES += $$PWD/custom/src/LogFileHelper.cpp
+HEADERS += $$PWD/custom/src/LogFileHelper.h
+
 
 # Main QGC Headers and Source files
 
@@ -748,6 +751,7 @@ HEADERS += \
     src/uas/UASMessageHandler.h \
     src/AnalyzeView/GeoTagController.h \
     src/AnalyzeView/ExifParser.h \
+
 
 contains (DEFINES, QGC_ENABLE_PAIRING) {
     HEADERS += \
@@ -1537,7 +1541,7 @@ LinuxBuild {
     share_qgroundcontrol.files = $${IN_PWD}/resources/
 
     share_icons.path = $${PREFIX}/share/icons/hicolor/128x128/apps/
-    share_icons.files = $${IN_PWD}/resources/icons/qgroundcontrol.png
+    share_icons.files = $${IN_PWD}/resources/icons/indrones-logo.png
     share_metainfo.path = $${PREFIX}/share/metainfo/
     share_metainfo.files = $${IN_PWD}/deploy/org.mavlink.qgroundcontrol.metainfo.xml
     share_applications.path = $${PREFIX}/share/applications/

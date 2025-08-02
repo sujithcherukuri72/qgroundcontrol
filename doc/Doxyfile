@@ -4,10 +4,10 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = QGroundControl
+PROJECT_NAME           = GroundControlStation
 PROJECT_NUMBER         =
-PROJECT_BRIEF          =
-PROJECT_LOGO           = ./qgroundcontrol.png
+PROJECT_BRIEF          ="Indrones Solutions Private Limited"
+PROJECT_LOGO           = ./indrones-logo.png
 OUTPUT_DIRECTORY       = .
 CREATE_SUBDIRS         = YES
 ALLOW_UNICODE_NAMES    = NO

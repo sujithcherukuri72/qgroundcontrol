@@ -1,0 +1,4 @@
+        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">src/FlightDisplay/FlyViewCustomLayer.qml</file>
+        <file alias="QGroundControl/FlightDisplay/CustomDashboardOverlay.qml">src/FlightDisplay/CustomDashboardOverlay.qml</file>
+
+
