@@ -1,14 +1,13 @@
 # Indrones Ground Control Station
 
 
-*GroundControl Station* (GCS) is an intuitive and powerful ground control station for UAVs.
+*Indrones GCS* (GCS) is an intuitive and powerful ground control station for UAVs.
 
-The primary goal of QGC is ease of use for both first time and professional users.
-It provides full flight control and mission planning for any MAVLink enabled drone, and vehicle setup for both PX4 and ArduPilot(APM) powered UAVs. Instructions for *using GroundControl Station* are provided in the [User Manual](https://docs.qgroundcontrol.com/en/) (you may not need them because the UI is very intuitive!)
+This is a **customized build of QGroundControl** tailored specifically for **Indrones Solutions Private Limited**, featuring
+ full flight control and mission planning for any MAVLink enabled drone, and vehicle setup for ArduPilot(APM) powered UAVs. Instructions for *using Indrones GCS * are provided in the [Custom User Manual]([https://docs.qgroundcontrol.com/en/](https://docs.google.com/document/d/1_ipRAkgV0zoKAxUKI69aawjVpmPPTQdNOBWRNjTQ8fw/edit?tab=t.0#heading=h.m2pbg7tifcuv)) (you may not need them because the UI is very intuitive!)
 
-##  Customized Version for Indrones Solutions Pvt. Ltd.
 
-This is a **customized build of QGroundControl** tailored specifically for **Indrones Solutions Private Limited**, featuring:
+
 
 ###  Key Custom Features
 
@@ -32,6 +31,7 @@ Feel free to contribute or explore the source code to extend this customized GCS
 
 Key Links:
 * [Website](http://indrones.com) (indrones.com)
+* [Custom User Manual](https://docs.google.com/document/d/1_ipRAkgV0zoKAxUKI69aawjVpmPPTQdNOBWRNjTQ8fw/edit?tab=t.0#heading=h.m2pbg7tifcuv)
 * [User Manual](https://docs.qgroundcontrol.com/en/)
 * [Developer Guide](https://dev.qgroundcontrol.com/en/)
 * [Discussion/Support](https://docs.qgroundcontrol.com/en/Support/Support.html)
