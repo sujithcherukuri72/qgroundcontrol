@@ -22,6 +22,9 @@
 #include "QGCApplication.h"
 #include "AppMessages.h"
 
+
+
+
 #ifndef NO_SERIAL_LINK
     #include "SerialLink.h"
 #endif
@@ -385,9 +388,10 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QList<QPair<QByteArray,QByteArray> > >();
 
     app->_initCommon();
+
+
     //-- Initialize Cache System
     getQGCMapEngine()->init();
-
     int exitCode = 0;
 
 #ifdef UNITTEST_BUILD
@@ -416,6 +420,7 @@ int main(int argc, char *argv[])
         checkAndroidWritePermission();
 #endif
         if (!app->_initForNormalAppBoot()) {
+
             return -1;
         }
         exitCode = app->exec();

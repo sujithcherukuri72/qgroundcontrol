@@ -19,6 +19,8 @@ import QGroundControl.Controls      1.0
 import QGroundControl.ScreenTools   1.0
 import QGroundControl.FlightDisplay 1.0
 import QGroundControl.FlightMap     1.0
+import QtQuick 2.12
+import "qrc:/Custom/Widgets" as Custom
 
 /// @brief Native QML top level window
 /// All properties defined here are visible to all QML pages.
@@ -27,6 +29,7 @@ ApplicationWindow {
     minimumWidth:   ScreenTools.isMobile ? Screen.width  : Math.min(ScreenTools.defaultFontPixelWidth * 100, Screen.width)
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
+    readonly property bool uiVisible: loginManager.isLoggedIn
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -323,6 +326,8 @@ ApplicationWindow {
     background: Item {
         id:             rootBackground
         anchors.fill:   parent
+        visible: uiVisible
+
     }
 
     //-------------------------------------------------------------------------
@@ -330,11 +335,11 @@ ApplicationWindow {
     header: MainToolBar {
         id:         toolbar
         height:     ScreenTools.toolbarHeight
-        visible:    !QGroundControl.videoManager.fullScreen
+        visible: uiVisible && !QGroundControl.videoManager.fullScreen
     }
 
     footer: LogReplayStatusBar {
-        visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
+        visible: uiVisible && QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
     }
 
     function showToolSelectDialog() {
@@ -468,12 +473,13 @@ ApplicationWindow {
     FlyView {
         id:             flightView
         anchors.fill:   parent
+        visible: uiVisible
     }
 
     PlanView {
         id:             planView
         anchors.fill:   parent
-        visible:        false
+         visible: uiVisible && false
     }
 
     Drawer {
@@ -484,7 +490,7 @@ ApplicationWindow {
         dragMargin:     0
         closePolicy:    Drawer.NoAutoClose
         interactive:    false
-        visible:        false
+        visible: uiVisible && false
 
         property alias backIcon:    backIcon.source
         property alias toolTitle:   toolbarDrawerText.text
@@ -733,4 +739,9 @@ ApplicationWindow {
             indicatorPopup.currentIndicator = null
         }
     }
+    Custom.LoginScreen {
+           anchors.fill: parent
+           z: 10000
+           visible: !loginManager.isLoggedIn
+       }
 }

@@ -12,39 +12,41 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QDateTime>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "QGCSettings.h"
 #include "MAVLinkLogManager.h"
-
-#include "CustomPlugin.h"
-
 #include "MultiVehicleManager.h"
 #include "QGCApplication.h"
 #include "SettingsManager.h"
 #include "AppMessages.h"
 #include "QmlComponentInfo.h"
 #include "QGCPalette.h"
+#include "CustomPlugin.h"
+#include "LoginManager.h"
+#include "QGCOptions.h"
 
 QGC_LOGGING_CATEGORY(CustomLog, "CustomLog")
 
-CustomFlyViewOptions::CustomFlyViewOptions(CustomOptions* options, QObject* parent)
+CustomFlyViewOptions::CustomFlyViewOptions(QGCOptions* options, QObject* parent)
     : QGCFlyViewOptions(options, parent)
 {
-
 }
 
 // This custom build does not support conecting multiple vehicles to it. This in turn simplifies various parts of the QGC ui.
-bool CustomFlyViewOptions::showMultiVehicleList(void) const
+bool CustomFlyViewOptions::showMultiVehicleList() const
 {
     return false;
 }
 
 // This custom build has it's own custom instrument panel. Don't show regular one.
-bool CustomFlyViewOptions::showInstrumentPanel(void) const
+bool CustomFlyViewOptions::showInstrumentPanel() const
 {
     return false;
 }
 
-CustomOptions::CustomOptions(CustomPlugin*, QObject* parent)
+// CustomOptions Implementation
+CustomOptions::CustomOptions(QObject* parent)
     : QGCOptions(parent)
 {
 }
@@ -74,12 +76,20 @@ bool CustomOptions::wifiReliableForCalibration(void) const
 CustomPlugin::CustomPlugin(QGCApplication *app, QGCToolbox* toolbox)
     : QGCCorePlugin(app, toolbox)
 {
-    _options = new CustomOptions(this, this);
+    _options = new CustomOptions(this);
+    _loginMgr = new LoginManager(this);  // Initialize login manager
     _showAdvancedUI = false;
+
+
+    connect(_loginMgr, &LoginManager::loginStatusChanged, this, [this]{
+        _showAdvancedUI = _loginMgr->isAdmin();
+        emit showAdvancedUIChanged(_showAdvancedUI);
+    });
 }
 
 CustomPlugin::~CustomPlugin()
 {
+    // LoginManager will be deleted automatically as it's a child
 }
 
 void CustomPlugin::setToolbox(QGCToolbox* toolbox)
@@ -103,26 +113,39 @@ void CustomPlugin::_addSettingsEntry(const QString& title, const char* qmlFile, 
     // 'this' instance will take ownership on the QmlComponentInfo instance
     _customSettingsList.append(QVariant::fromValue(
         new QmlComponentInfo(title,
-                QUrl::fromUserInput(qmlFile),
-                iconFile == nullptr ? QUrl() : QUrl::fromUserInput(iconFile),
-                this)));
+                             QUrl::fromUserInput(qmlFile),
+                             iconFile == nullptr ? QUrl() : QUrl::fromUserInput(iconFile),
+                             this)));
 }
 
 //-----------------------------------------------------------------------------
-QVariantList&
-CustomPlugin::settingsPages()
+QVariantList& CustomPlugin::settingsPages()
 {
-    if(_customSettingsList.isEmpty()) {
-        _addSettingsEntry(tr("General"),     "qrc:/qml/GeneralSettings.qml",     "qrc:/res/gear-white.svg");
-        _addSettingsEntry(tr("Comm Links"),  "qrc:/qml/LinkSettings.qml",        "qrc:/res/waves.svg");
-        _addSettingsEntry(tr("Offline Maps"),"qrc:/qml/OfflineMap.qml",          "qrc:/res/waves.svg");
-        _addSettingsEntry(tr("MAVLink"),     "qrc:/qml/MavlinkSettings.qml",     "qrc:/res/waves.svg");
-        _addSettingsEntry(tr("Console"),     "qrc:/qml/QGroundControl/Controls/AppMessages.qml");
+    //clearnig the list
+    _customSettingsList.clear();  // Just clear
+
+    // ── ADMIN UI─────────────────────────────────────────────
+    if (_loginMgr && _loginMgr->isAdmin()) {
+        _addSettingsEntry(tr("General"),      "qrc:/qml/GeneralSettings.qml",      "qrc:/res/gear-white.svg");
+        _addSettingsEntry(tr("Comm Links"),   "qrc:/qml/LinkSettings.qml",         "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("Offline Maps"), "qrc:/qml/OfflineMap.qml",           "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("MAVLink"),      "qrc:/qml/MavlinkSettings.qml",      "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("Console"),      "qrc:/qml/QGroundControl/Controls/AppMessages.qml");
+        _addSettingsEntry(tr("Firmware"),     "qrc:/qml/FirmwareUpgrade.qml",      "qrc:/res/FirmwareUpgradeIcon.png");  // Added Firmware upgarde details
+
 #if defined(QT_DEBUG)
-        //-- These are always present on Debug builds
-        _addSettingsEntry(tr("Mock Link"),   "qrc:/qml/MockLink.qml");
+        _addSettingsEntry(tr("Mock Link"),    "qrc:/qml/MockLink.qml");
 #endif
     }
+    // ── USER (restricted firmware to user) ─────────────────────────────────
+    else if (_loginMgr && _loginMgr->isLoggedIn()) {
+        _addSettingsEntry(tr("General"),      "qrc:/qml/GeneralSettings.qml",      "qrc:/res/gear-white.svg");
+        _addSettingsEntry(tr("Comm Links"),   "qrc:/qml/LinkSettings.qml",         "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("Offline Maps"), "qrc:/qml/OfflineMap.qml",           "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("MAVLink"),      "qrc:/qml/MavlinkSettings.qml",      "qrc:/res/waves.svg");
+        _addSettingsEntry(tr("Console"),      "qrc:/qml/QGroundControl/Controls/AppMessages.qml");
+    }
+
     return _customSettingsList;
 }
 
@@ -130,6 +153,7 @@ QGCOptions* CustomPlugin::options()
 {
     return _options;
 }
+
 //-----------------------------------------------------------------------------------
 QString CustomPlugin::brandImageIndoor(void) const
 {
@@ -144,11 +168,20 @@ QString CustomPlugin::brandImageOutdoor(void) const
 bool CustomPlugin::overrideSettingsGroupVisibility(QString name)
 {
     // We have set up our own specific brand imaging. Hide the brand image settings such that the end user
-    // can't change it.
     if (name == BrandImageSettings::name) {
         return false;
     }
-    return true;
+
+    // Hide settings until logged in (except brand image settings)
+    if (!_loginMgr->isLoggedIn()) {
+        return false;
+    }
+    // Admin sees all
+    if (_loginMgr->isAdmin())
+        return QGCCorePlugin::overrideSettingsGroupVisibility(name);
+
+    // User: allow only if not in restricted list
+    return !_userRestricted.contains(name);
 }
 
 // This allows you to override/hide QGC Application settings
@@ -170,7 +203,32 @@ bool CustomPlugin::adjustSettingMetaData(const QString& settingsGroup, FactMetaD
 
     return parentResult;
 }
+// We override this so we can get access to QQmlApplicationEngine and use it to register our qml module
+QQmlApplicationEngine* CustomPlugin::createQmlApplicationEngine(QObject* parent)
+{
+  QPixmap logo(":/custom/img/Indrones-splashimage.png");
+QSplashScreen* splash = new QSplashScreen(logo);
+splash->show();
 
+//main startup engine created here
+QQmlApplicationEngine* qmlEngine = QGCCorePlugin::createQmlApplicationEngine(parent);
+qmlEngine->addImportPath("qrc:/Custom/Widgets");
+qmlEngine->rootContext()->setContextProperty("loginManager", _loginMgr);
+qmlEngine->load(QUrl(QStringLiteral("qrc:/Custom/Widgets/MainRootWindow.qml")));
+
+
+QTimer* splashTimer = new QTimer();
+splashTimer->setSingleShot(true);
+QObject::connect(splashTimer, &QTimer::timeout, [splash, splashTimer]() {
+    splash->close();
+    splash->deleteLater();
+    splashTimer->deleteLater();
+});
+splashTimer->start(3000);
+
+return qmlEngine;
+
+}
 // This modifies QGC colors palette to match possible custom corporate branding
 void CustomPlugin::paletteOverride(QString colorName, QGCPalette::PaletteColorInfo_t& colorInfo)
 {
@@ -362,10 +420,3 @@ void CustomPlugin::paletteOverride(QString colorName, QGCPalette::PaletteColorIn
     }
 }
 
-// We override this so we can get access to QQmlApplicationEngine and use it to register our qml module
-QQmlApplicationEngine* CustomPlugin::createQmlApplicationEngine(QObject* parent)
-{
-    QQmlApplicationEngine* qmlEngine = QGCCorePlugin::createQmlApplicationEngine(parent);
-    qmlEngine->addImportPath("qrc:/Custom/Widgets");
-    return qmlEngine;
-}

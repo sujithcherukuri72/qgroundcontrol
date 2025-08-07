@@ -18,6 +18,7 @@ import QGroundControl.Palette               1.0
 import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.ScreenTools           1.0
 import QGroundControl.Controllers           1.0
+import "qrc:/Custom/Widgets" as Custom
 
 Rectangle {
     id:     _root
@@ -28,6 +29,12 @@ Rectangle {
     readonly property int flyViewToolbar:   0
     readonly property int planViewToolbar:  1
     readonly property int simpleToolbar:    2
+
+    // ═══ DASHBOARD TOGGLE PROPERTY  ═══
+    property bool dashboardVisible: false
+
+    // ═══ VARIABLE TO COMMUNICATE WITH FLYVIEW  ═══
+    signal toggleDashboard(bool visible)
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
@@ -83,6 +90,8 @@ Rectangle {
             onClicked:          _activeVehicle.closeVehicle()
             visible:            _activeVehicle && _communicationLost && currentToolbar === flyViewToolbar
         }
+
+
     }
 
     QGCFlickable {
@@ -104,6 +113,193 @@ Rectangle {
             source:             currentToolbar === flyViewToolbar ?
                                     "qrc:/toolbar/MainToolBarIndicators.qml" :
                                     (currentToolbar == planViewToolbar ? "qrc:/qml/PlanToolBarIndicators.qml" : "")
+        }
+    }
+    // ═══════ PROFILE BUTTON  ═══════
+    QGCToolBarButton {
+        id:                     profileButton
+        anchors.right:          parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: 100
+        icon.source:            "/qmlimages/Hamburger.svg"
+        visible:                loginManager && loginManager.isLoggedIn
+        onClicked:              profilePopup.open()
+    }
+
+    // PROFILE POPUP
+    Popup {
+        id:             profilePopup
+        modal:          false
+        focus:          true
+        closePolicy:    Popup.CloseOnEscape | Popup.CloseOnPressOutside
+           x: profileButton.x - width + profileButton.width
+           y: profileButton.y + profileButton.height + ScreenTools.defaultFontPixelHeight * 0.25
+
+           width:  ScreenTools.defaultFontPixelWidth * 28
+           height: profileContent.height + (ScreenTools.defaultFontPixelHeight * 1.5)
+
+        background: Rectangle {
+            color:          qgcPal.button
+            border.color:   qgcPal.text
+            border.width:   1
+            radius:         ScreenTools.defaultFontPixelHeight * 0.25
+        }
+
+        Column {
+            id:         profileContent
+            anchors.centerIn: parent
+            spacing:    ScreenTools.defaultFontPixelHeight * 0.75
+            width:      parent.width - (ScreenTools.defaultFontPixelWidth * 2)
+
+            // Header with user icon
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: ScreenTools.defaultFontPixelWidth
+
+                QGCColoredImage {
+                    width: ScreenTools.defaultFontPixelHeight * 1.5
+                    height: width
+                    source: "/qmlimages/Profile-icon.svg"
+                    color: qgcPal.text
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                QGCLabel {
+                    text: qsTr("Profile")
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            Rectangle {
+                width:  parent.width
+                height: 1
+                color:  qgcPal.text
+                opacity: 0.3
+            }
+
+           // User info
+            Column {
+                width:      parent.width
+                spacing:    ScreenTools.defaultFontPixelHeight * 0.25
+
+                QGCLabel {
+                    text: loginManager ? qsTr("User: ") + loginManager.username : qsTr("User: Not logged in")
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                }
+
+                Rectangle {
+                    width: roleLabel.width + (ScreenTools.defaultFontPixelWidth * 1.5)
+                    height: roleLabel.height + (ScreenTools.defaultFontPixelHeight * 0.5)
+                    radius: height * 0.25
+                    color: loginManager && loginManager.isAdmin ? qgcPal.colorGreen : qgcPal.colorBlue
+                    opacity: 0.2
+
+                    QGCLabel {
+                        id: roleLabel
+                        anchors.centerIn: parent
+                        text: loginManager ? (loginManager.isAdmin ? qsTr("Administrator") : qsTr("User")) : qsTr("Guest")
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.bold: true
+                        color: loginManager && loginManager.isAdmin ? qgcPal.colorGreen : qgcPal.colorBlue
+                    }
+                }
+
+                // Status indicator
+                Row {
+                    spacing: ScreenTools.defaultFontPixelWidth * 0.5
+
+                    Rectangle {
+                        width: ScreenTools.defaultFontPixelHeight * 0.75
+                        height: width
+                        radius: width * 0.5
+                        color: loginManager && loginManager.isLoggedIn ? qgcPal.colorGreen : qgcPal.colorRed
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    QGCLabel {
+                        text: loginManager && loginManager.isLoggedIn ? qsTr("Online") : qsTr("Offline")
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        color: loginManager && loginManager.isLoggedIn ? qgcPal.colorGreen : qgcPal.colorRed
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+
+            Rectangle {
+                width:  parent.width
+                height: 1
+                color:  qgcPal.text
+                opacity: 0.3
+            }
+
+            // ═══ ACTION BUTTONS ═══
+            Column {
+                width:      parent.width
+                spacing:    ScreenTools.defaultFontPixelHeight * 0.5
+
+                QGCButton {
+                    text:           dashboardVisible ? qsTr("Hide Dashboard") : qsTr("Show Dashboard")
+                    width:          parent.width
+                    icon.source:    "/qmlimages/Home.svg"
+                    onClicked: {
+                        // Toggle dashboard visibility
+                        dashboardVisible = !dashboardVisible
+
+                        // Emit signal to FlyView
+                        _root.toggleDashboard(dashboardVisible)
+
+                        // Ensure we're in FlyView
+                        mainWindow.showFlyView()
+
+                        profilePopup.close()
+                    }
+                }
+
+                QGCButton {
+                    text:           qsTr("Settings")
+                    width:          parent.width
+                    icon.source:    "/qmlimages/Gears.svg"
+                    visible:        loginManager && loginManager.isAdmin
+                    onClicked: {
+                        mainWindow.showSettingsTool()
+                        profilePopup.close()
+                    }
+                }
+
+                QGCButton {
+                    text:           qsTr("Log Out")
+                    width:          parent.width
+                    icon.source:    "/qmlimages/PowerButton.svg"
+                    enabled:        loginManager && loginManager.isLoggedIn
+                    onClicked: {
+                        if (loginManager) {
+                            loginManager.logout()
+                        }
+                        // Hide dashboard on logout
+                        dashboardVisible = false
+                        _root.toggleDashboard(false)
+                        profilePopup.close()
+                    }
+                }
+            }
+        }
+    }
+
+    // Auto-close popup and reset dashboard on login status change
+    Connections {
+        target: loginManager
+        ignoreUnknownSignals: true
+        function onLoginStatusChanged() {
+            if (profilePopup) {
+                profilePopup.close()
+            }
+            // Hide dashboard when login status changes
+            if (!loginManager || !loginManager.isLoggedIn) {
+                dashboardVisible = false
+                _root.toggleDashboard(false)
+            }
         }
     }
 

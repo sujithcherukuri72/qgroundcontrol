@@ -22,28 +22,31 @@ DEFINES += GIT_VERSION=\"\\\"$$CUSTOM_QGC_VERSION\\\"\"
 
 message(Custom QGC Version: $${CUSTOM_QGC_VERSION})
 
-# Build a single flight stack by disabling APM support
-MAVLINK_CONF = common
-CONFIG  += QGC_DISABLE_APM_MAVLINK
-CONFIG  += QGC_DISABLE_APM_PLUGIN QGC_DISABLE_APM_PLUGIN_FACTORY
+# Build a single flight stack by disabling APM(ArduPilotMega) support (i'm enabling because i need arducopter for SITL)
+MAVLINK_CONF = ardupilotmega
+# CONFIG  += QGC_DISABLE_APM_MAVLINK
+# CONFIG  += QGC_DISABLE_APM_PLUGIN QGC_DISABLE_APM_PLUGIN_FACTORY
+CONFIG += APMFirmwarePlugin
+CONFIG -= QGC_DISABLE_APM_PLUGIN
+CONFIG -= QGC_DISABLE_APM_MAVLINK
+CONFIG -= QGC_DISABLE_APM_PLUGIN_FACTORY
 
-# We implement our own PX4 plugin factory
-CONFIG  += QGC_DISABLE_PX4_PLUGIN_FACTORY
+#CONFIG  += QGC_DISABLE_PX4_PLUGIN_FACTORY
 
 # Branding
 
 DEFINES += CUSTOMHEADER=\"\\\"CustomPlugin.h\\\"\"
 DEFINES += CUSTOMCLASS=CustomPlugin
 
-QGC_APP_NAME        = "Indrones"
+QGC_APP_NAME        = "IndronesGCS"
 QGC_BINARY_NAME     = "CustomIndrones"
-QGC_ORG_NAME        = "Custom"
+QGC_ORG_NAME        = "Indrones.com"
 QGC_ORG_DOMAIN      = "org.Indrones"
 QGC_ANDROID_PACKAGE = "org.custom.Indrones"
-QGC_APP_DESCRIPTION = "Indrones"
-QGC_APP_COPYRIGHT   = "Copyright (C) 2020 Indrones Development Team. All rights reserved."
+QGC_APP_DESCRIPTION = "Indrones-Customized QGCS"
+QGC_APP_COPYRIGHT   = "Copyright (C) 2025 Indrones Development Team. All rights reserved."
 
-TARGET   = CustomQGroundControl
+TARGET   = CustomGroundControl
 DEFINES += QGC_APPLICATION_NAME=\"\\\"$$QGC_APP_NAME\\\"\"
 DEFINES += QGC_ORG_NAME=\"\\\"$$QGC_ORG_NAME\\\"\"
 DEFINES += QGC_ORG_DOMAIN=\"\\\"$$QGC_ORG_DOMAIN\\\"\"
@@ -64,26 +67,30 @@ QML_IMPORT_PATH += \
 # Our own, custom sources
 SOURCES += \
     $$PWD/src/CustomPlugin.cc \
+    $$PWD/src/LoginManager.cpp
 
 HEADERS += \
     $$PWD/src/CustomPlugin.h \
+    $$PWD/src/LoginManager.h
 
 INCLUDEPATH += \
     $$PWD/src \
 
 #-------------------------------------------------------------------------------------
-# Custom Firmware/AutoPilot Plugin
+# Custom Firmware/AutoPilot --Plugin These are the custom Firmwares (commented to enable arducopter and general px4 not customised)
 
-INCLUDEPATH += \
-    $$PWD/src/FirmwarePlugin \
-    $$PWD/src/AutoPilotPlugin
+# INCLUDEPATH += \
+#     $$PWD/src/FirmwarePlugin \
+#     $$PWD/src/AutoPilotPlugin
 
-HEADERS+= \
-    $$PWD/src/AutoPilotPlugin/CustomAutoPilotPlugin.h \
-    $$PWD/src/FirmwarePlugin/CustomFirmwarePlugin.h \
-    $$PWD/src/FirmwarePlugin/CustomFirmwarePluginFactory.h \
+# HEADERS+= \
+#     $$PWD/src/AutoPilotPlugin/CustomAutoPilotPlugin.h \
+#     $$PWD/src/FirmwarePlugin/CustomFirmwarePlugin.h \
+#     $$PWD/src/FirmwarePlugin/CustomFirmwarePluginFactory.h \
 
-SOURCES += \
-    $$PWD/src/AutoPilotPlugin/CustomAutoPilotPlugin.cc \
-    $$PWD/src/FirmwarePlugin/CustomFirmwarePlugin.cc \
-    $$PWD/src/FirmwarePlugin/CustomFirmwarePluginFactory.cc \
+# SOURCES += \
+#     $$PWD/src/AutoPilotPlugin/CustomAutoPilotPlugin.cc \
+#     $$PWD/src/FirmwarePlugin/CustomFirmwarePlugin.cc \
+#     $$PWD/src/FirmwarePlugin/CustomFirmwarePluginFactory.cc \
+
+
