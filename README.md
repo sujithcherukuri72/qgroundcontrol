@@ -1,8 +1,5 @@
 # Indrones Ground Control Station
 
-[![Releases](https://img.shields.io/github/release/mavlink/QGroundControl.svg)](https://github.com/mavlink/QGroundControl/releases)
-[![Travis Build Status](https://travis-ci.org/mavlink/qgroundcontrol.svg?branch=master)](https://travis-ci.org/mavlink/qgroundcontrol)
-
 
 *GroundControl Station* (GCS) is an intuitive and powerful ground control station for UAVs.
 
