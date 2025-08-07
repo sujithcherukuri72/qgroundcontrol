@@ -5,7 +5,7 @@
 
 This is a **customized build of QGroundControl** tailored specifically for **Indrones Solutions Private Limited**, featuring
  full flight control and mission planning for any MAVLink enabled drone, and vehicle setup for ArduPilot(APM) powered UAVs. Instructions for *using Indrones GCS* 
- are provided in the [Custom User Manual]([https://docs.google.com/document/d/1_ipRAkgV0zoKAxUKI69aawjVpmPPTQdNOBWRNjTQ8fw/edit?tab=t.0#heading=h.m2pbg7tifcuv]) (you may not need them because the UI is very intuitive!)
+ are provided in the [Custom User Manual](https://docs.google.com/document/d/1_ipRAkgV0zoKAxUKI69aawjVpmPPTQdNOBWRNjTQ8fw/edit?tab=t.0#heading=h.m2pbg7tifcuv) (you may not need them because the UI is very intuitive!)
 
 
 
